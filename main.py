@@ -19,6 +19,8 @@ with open("config.json", "r") as json_settings:
 TOKIN=settings["tokin"]
 
 log=logse()
+bot = telebot.TeleBot(TOKIN ,num_threads=5)
+
 
 # Функция для мониторинга ресурсов
 def monitor_resources():
@@ -49,11 +51,6 @@ def monitor_resources():
     return round(cpu_percent/popitki,1), round(ram_percent/popitki,1), round(disk_percent/popitki,1), str(str(round(response_time/popitki,3))+'s'+scode+shutka),round(popitka1,3)
 
 
-
-
-bot = telebot.TeleBot(TOKIN ,num_threads=5)
-
-
 @bot.message_handler(commands=['test'])
 def monitor_test_command(message):
     test=''
@@ -67,6 +64,16 @@ def monitor_test_command(message):
 
     cpu_percent, ram_percent, disk_percent, response_time, ping1 = monitor_resources()
     bot.send_message(message.chat.id, f"CPU: {cpu_percent}%\nRAM: {ram_percent}%\nDisk: {disk_percent}%\nPing: {response_time}\n∟{ping1}\nфайл подкачки: {swap.percent}% ({swap.total / 1073741824:.2f} GB)\n\n{test}")
+    
+@bot.message_handler(commands=['ls','dir'])
+def ls(message):
+    buff=''
+    for file in os.listdir():
+        size=f"{os.path.getsize(file)} Байт"
+        if type(size) != str and size>=1024:
+            size=f"{round(size/1024, 1)} КБ"
+        buff=buff+f"{file} {size}\n"
+    bot.reply_to(message, buff)
     
     
 @bot.message_handler(content_types=['audio', 'photo', 'voice', 'video', 'document','text', 'location', 'contact', 'sticker'])
