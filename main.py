@@ -8,6 +8,8 @@ import telebot
 import requests
 import psutil
 
+from libs.tpg_loger import logse
+
 
 #     инициализация всякого
 
@@ -16,6 +18,7 @@ with open("config.json", "r") as json_settings:
 
 TOKIN=settings["tokin"]
 
+log=logse()
 
 # Функция для мониторинга ресурсов
 def monitor_resources():
@@ -60,18 +63,21 @@ def monitor_test_command(message):
         test=test+'cofig file OK\n'
     else:
         test=test+'error no config file \n'
-    test=test+f"ID> {message.from_user.id}\n"
     test=test+f"IP>{requests.get('https://api.ipify.org').content.decode('utf8')}\n"
 
     cpu_percent, ram_percent, disk_percent, response_time, ping1 = monitor_resources()
-    bot.send_message(message.chat.id, f"CPU: {cpu_percent}%\nRAM: {ram_percent}%\nDisk: {disk_percent}%\nPing: {response_time}\n∟{ping1}\nфайл подкачки: {swap.percent}% ({swap.total / 1073741824:.2f} GB)\nadmin > {bot.get_chat_member(message.chat.id, message.from_user.id).status in ['creator','administrator']}\n\n{test}")
+    bot.send_message(message.chat.id, f"CPU: {cpu_percent}%\nRAM: {ram_percent}%\nDisk: {disk_percent}%\nPing: {response_time}\n∟{ping1}\nфайл подкачки: {swap.percent}% ({swap.total / 1073741824:.2f} GB)\n\n{test}")
     
     
+@bot.message_handler(content_types=['audio', 'photo', 'voice', 'video', 'document','text', 'location', 'contact', 'sticker'])
+def message_handler(message):
+    #log message
+    log.info(f"chat>> {message.chat.id} user>> {message.from_user.username} id>> {message.from_user.id}| сообщение >>\n{str(message.text if message.content_type == 'text' else message.content_type)}")
 
 
 def main():
     get_num=0
-    print("\033[32mнет ошибок :3\033[0m")
+    log.info("\033[32mнет ошибок :3\033[0m")
     while True:
         try:
             try:
@@ -81,11 +87,11 @@ def main():
                     get_num=0
                     time.sleep(1)
             except requests.exceptions.ReadTimeout as e:
-                print(f"time out ({e})")
+                log.error(f"time out ({e})")
             except requests.exceptions.ConnectionError as e:
-                print(f"Error Connection ({e})\n{traceback.format_exc()}")
+                log.error(f"Error Connection ({e})\n{traceback.format_exc()}")
         except Exception as e:
-            print(f"Ошибка: {e} \n-----------------------------\n{traceback.format_exc()}")
+            log.error(f"Ошибка: {e} \n-----------------------------\n{traceback.format_exc()}")
             time.sleep(3)
 if __name__ == '__main__':
     main()
