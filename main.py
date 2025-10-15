@@ -7,6 +7,7 @@ import traceback
 import telebot
 import requests
 import psutil
+import subprocess
 
 from libs.tpg_loger import logse
 
@@ -17,6 +18,7 @@ with open("config.json", "r") as json_settings:
     settings = json.load(json_settings)
 
 TOKIN=settings["tokin"]
+USERS=list(settings["users"])
 
 log=logse()
 bot = telebot.TeleBot(TOKIN ,num_threads=5)
@@ -74,6 +76,37 @@ def ls(message):
             size=f"{round(size/1024, 1)} КБ"
         buff=buff+f"{file} {size}\n"
     bot.reply_to(message, buff)
+    
+@bot.message_handler(commands=['cd'])
+def cd(message):
+    dir=message.text.split(' ',1)[1]
+    old_dir=os.getcwd()
+    os.chdir(dir)
+    bot.reply_to(message,f"{old_dir} -> {os.getcwd()}")
+    
+@bot.message_handler(commands=['pwd'])
+def pwd(message):
+    bot.reply_to(message,f"{os.getcwd()}")
+    
+@bot.message_handler(commands=['cmd','console'])
+def console(message):
+    if message.from_user.id not in USERS:
+        bot.reply_to(message, "нет у вас досупа!")
+        return
+    try:        
+        command=str(message.text).split(' ',1)[1]
+        
+        if sys.platform.startswith('win'):
+            result=subprocess.run(command , shell=True, stdout=subprocess.PIPE, text=True)
+            out=result.stdout
+        else:
+            result=subprocess.run(command , shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            out=result.stdout + result.stderr 
+                
+            bot.reply_to(message, str(out))
+    except:
+        bot.reply_to(message,traceback.format_exc())
+
     
     
 @bot.message_handler(content_types=['audio', 'photo', 'voice', 'video', 'document','text', 'location', 'contact', 'sticker'])
