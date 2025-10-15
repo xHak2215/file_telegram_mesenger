@@ -14,9 +14,12 @@ from libs.tpg_loger import logse
 
 #     инициализация всякого
 
-with open("config.json", "r") as json_settings:
-    settings = json.load(json_settings)
-
+try:
+    with open("config.json", "r") as json_settings:
+        settings = json.load(json_settings)
+except:
+    with open("config.json", "w") as json_settings:
+        json.dump(json_settings,{"tokin":" ","users":[5194033781]})
 TOKIN=settings["tokin"]
 USERS=list(settings["users"])
 
