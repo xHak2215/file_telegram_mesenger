@@ -118,8 +118,14 @@ def download_file(message):
     
     file=os.path.join(message.text.split(' ',1)[1])
     if os.path.isfile(file):
-        with open(file, 'rb') as f:
-            bot.send_document(message.chat.id, f, reply_to_message_id=message.id)
+        try:
+            with open(file, 'rb') as f:
+                bot.send_document(message.chat.id, f, reply_to_message_id=message.id)
+        except Exception as e:
+            bot.reply_to(message, str(e))
+            log.error(traceback.format_exc())
+    else:
+        bot.reply_to(message, "такого файла нет! или это не файл")
             
 @bot.message_handler(commands=['upload'])
 def upload_file(message):
@@ -129,8 +135,12 @@ def upload_file(message):
     
     if message.reply_to_message:
         if message.reply_to_message.document:
-            file_info = bot.get_file(message.reply_to_message.document.file_id)
-            downloaded_file = bot.download_file(file_info.file_path)
+            try:
+                file_info = bot.get_file(message.reply_to_message.document.file_id)
+                downloaded_file = bot.download_file(file_info.file_path)
+            except Exception as e:
+                bot.reply_to(message, str(e))
+                log.error(traceback.format_exc())
 
             with open(os.path.join(os.getcwd(),message.reply_to_message.document.file_name), 'wb') as new_file:
                 new_file.write(downloaded_file)
@@ -170,7 +180,7 @@ def main():
     while True:
         try:
             try:
-                get_num=+1
+                get_num=get_num+1
                 bot.polling(none_stop=True,timeout=30,long_polling_timeout=30,interval=1)
                 if get_num >=100:
                     get_num=0
@@ -180,7 +190,7 @@ def main():
             except requests.exceptions.ConnectionError as e:
                 log.error(f"Error Connection ({e})\n{traceback.format_exc()}")
         except Exception as e:
-            log.error(f"Ошибка: {e} \n-----------------------------\n{traceback.format_exc()}")
+            log.error(f"Ошибка: {e}\n-----------------------------\n{traceback.format_exc()}")
             time.sleep(3)
 if __name__ == '__main__':
     main()
