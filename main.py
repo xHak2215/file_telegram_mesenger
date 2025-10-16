@@ -3,6 +3,7 @@ import sys
 import json
 import time
 import traceback
+from datetime import datetime
 
 import telebot
 import requests
@@ -74,9 +75,11 @@ def monitor_test_command(message):
 def ls(message):
     buff=''
     for file in os.listdir():
-        size=f"{os.path.getsize(file)} Байт"
-        if type(size) != str and size>=1024:
+        size=os.path.getsize(file)
+        if size>=1024:
             size=f"{round(size/1024, 1)} КБ"
+        else:
+            size=f"{size} Байт"
         buff=buff+f"{file} {size}\n"
     bot.reply_to(message, buff)
     
@@ -150,7 +153,7 @@ def upload_file(message):
             file_info = bot.get_file(message.reply_to_message.photo[len(message.reply_to_message.photo) - 1].file_id)
             downloaded_file = bot.download_file(file_info.file_path)
 
-            with open(os.path.join(os.getcwd(), file_info.file_path), 'wb') as new_file:
+            with open(os.path.join(os.getcwd(), f"img_upload_{datetime.now().strftime("%Hh%Mm")}.jpg"), 'wb') as new_file:
                 new_file.write(downloaded_file)
             bot.reply_to(message, "suppress ")
                 
@@ -158,7 +161,7 @@ def upload_file(message):
             file_info = bot.get_file(message.reply_to_message.video[len(message.reply_to_message.video) - 1].file_id)
             downloaded_file = bot.download_file(file_info.file_path)
 
-            with open(os.path.join(os.getcwd(), file_info.file_path), 'wb') as new_file:
+            with open(os.path.join(os.getcwd(),  f"vid_upload_{datetime.now().strftime("%Hh%Mm")}.mp4"), 'wb') as new_file:
                 new_file.write(downloaded_file)
             bot.reply_to(message, "suppress ")
             
