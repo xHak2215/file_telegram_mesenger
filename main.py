@@ -94,7 +94,7 @@ def pwd(message):
 @bot.message_handler(commands=['cmd','console'])
 def console(message):
     if message.from_user.id not in USERS:
-        bot.reply_to(message, "нет у вас досупа!")
+        bot.reply_to(message, "у вас нет доступа!")
         return
     try:        
         command=str(message.text).split(' ',1)[1]
@@ -112,6 +112,10 @@ def console(message):
 
 @bot.message_handler(commands=['download'])
 def download_file(message):
+    if message.from_user.id not in USERS:
+        bot.reply_to(message, "у вас нет доступа!")
+        return
+    
     file=os.path.join(message.text.split(' ',1)[1])
     if os.path.isfile(file):
         with open(file, 'rb') as f:
@@ -119,25 +123,29 @@ def download_file(message):
             
 @bot.message_handler(commands=['upload'])
 def upload_file(message):
+    if message.from_user.id not in USERS:
+        bot.reply_to(message, "у вас нет доступа!")
+        return
+    
     if message.reply_to_message:
-        if message.document:
-            file_info = bot.get_file(message.document.file_id)
+        if message.reply_to_message.document:
+            file_info = bot.get_file(message.reply_to_message.document.file_id)
             downloaded_file = bot.download_file(file_info.file_path)
 
-            with open(os.path.join(os.getcwd(),message.document.file_name), 'wb') as new_file:
+            with open(os.path.join(os.getcwd(),message.reply_to_message.document.file_name), 'wb') as new_file:
                 new_file.write(downloaded_file)
             bot.reply_to(message, "suppress ")
                 
-        elif message.photo:
-            file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        elif message.reply_to_message.photo:
+            file_info = bot.get_file(message.reply_to_message.photo[len(message.reply_to_message.photo) - 1].file_id)
             downloaded_file = bot.download_file(file_info.file_path)
 
             with open(os.path.join(os.getcwd(), file_info.file_path), 'wb') as new_file:
                 new_file.write(downloaded_file)
             bot.reply_to(message, "suppress ")
                 
-        elif message.video:
-            file_info = bot.get_file(message.video[len(message.video) - 1].file_id)
+        elif message.reply_to_message.video:
+            file_info = bot.get_file(message.reply_to_message.video[len(message.reply_to_message.video) - 1].file_id)
             downloaded_file = bot.download_file(file_info.file_path)
 
             with open(os.path.join(os.getcwd(), file_info.file_path), 'wb') as new_file:
@@ -149,7 +157,7 @@ def upload_file(message):
     else:
         bot.reply_to(message, "команда должна быть ответом на дакумент для его загрузки")
     
-    
+
 @bot.message_handler(content_types=['audio', 'photo', 'voice', 'video', 'document','text', 'location', 'contact', 'sticker'])
 def message_handler(message):
     #log message
