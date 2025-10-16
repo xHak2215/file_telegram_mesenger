@@ -110,6 +110,44 @@ def console(message):
     except:
         bot.reply_to(message,traceback.format_exc())
 
+@bot.message_handler(commands=['download'])
+def download_file(message):
+    file=os.path.join(message.text.split(' ',1)[1])
+    if os.path.isfile(file):
+        with open(file, 'rb') as f:
+            bot.send_document(message.chat.id, f, reply_to_message_id=message.id)
+            
+@bot.message_handler(commands=['upload'])
+def upload_file(message):
+    if message.reply_to_message:
+        if message.document:
+            file_info = bot.get_file(message.document.file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+
+            with open(os.path.join(os.getcwd(),message.document.file_name), 'wb') as new_file:
+                new_file.write(downloaded_file)
+            bot.reply_to(message, "suppress ")
+                
+        elif message.photo:
+            file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+
+            with open(os.path.join(os.getcwd(), file_info.file_path), 'wb') as new_file:
+                new_file.write(downloaded_file)
+            bot.reply_to(message, "suppress ")
+                
+        elif message.video:
+            file_info = bot.get_file(message.video[len(message.video) - 1].file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+
+            with open(os.path.join(os.getcwd(), file_info.file_path), 'wb') as new_file:
+                new_file.write(downloaded_file)
+            bot.reply_to(message, "suppress ")
+            
+        else:
+            bot.reply_to(message, "не подходящий тип сообщения")
+    else:
+        bot.reply_to(message, "команда должна быть ответом на дакумент для его загрузки")
     
     
 @bot.message_handler(content_types=['audio', 'photo', 'voice', 'video', 'document','text', 'location', 'contact', 'sticker'])
@@ -120,7 +158,7 @@ def message_handler(message):
 
 def main():
     get_num=0
-    log.info("\033[32mнет ошибок :3\033[0m")
+    print("\033[32mнет ошибок :3\033[0m")
     while True:
         try:
             try:
