@@ -56,6 +56,20 @@ def monitor_resources():
         shutka='\nпроцессор шя рванет 🤯'
     return round(cpu_percent/popitki,1), round(ram_percent/popitki,1), round(disk_percent/popitki,1), str(str(round(response_time/popitki,3))+'s'+scode+shutka),round(popitka1,3)
 
+@bot.message_handler(commands=['help'])
+def help(message):
+    helpm="""
+<code>/ls</code> - список файлов текущей директории
+
+<code>/pwd</code> - отображение  текущей директории
+
+<code>/cd</code> - перемещение по директориям, пример: <code>/cd папка</code>
+
+<code>/download</code> - отправка файлов, привер: <code>/download файл</code>
+
+<code>/upload</code> - загрузка файла на сервер с ботам, для загрузки необходимо отправить боту дакумент фото или видео далее нужно ответить командой <code>/upload</code> на это сообщение
+    """
+    bot.reply_to(message, helpm, parse_mode='HTML', disable_web_page_preview=True)
 
 @bot.message_handler(commands=['test'])
 def monitor_test_command(message):
@@ -87,9 +101,12 @@ def ls(message):
 def cd(message):
     dir=message.text.split(' ',1)[1]
     old_dir=os.getcwd()
-    os.chdir(dir)
-    bot.reply_to(message,f"{old_dir} -> {os.getcwd()}")
-    
+    if os.path.isdir(dir):
+        os.chdir(dir)
+        bot.reply_to(message,f"{old_dir} -> {os.getcwd()}")
+    else:
+        bot.reply_to(message, "такой директории нет или это не директория")
+        
 @bot.message_handler(commands=['pwd'])
 def pwd(message):
     bot.reply_to(message,f"{os.getcwd()}")
