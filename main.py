@@ -21,6 +21,8 @@ try:
 except:
     with open("config.json", "w") as json_settings:
         json.dump(json_settings,{"tokin":" ","users":[5194033781]})
+    print("пожалуйста настройте бота (файл config.json) и перезапустите его")
+    exit(1)
 TOKIN=settings["tokin"]
 USERS=list(settings["users"])
 
@@ -55,6 +57,8 @@ def monitor_resources():
     if round(cpu_percent/popitki)==100:
         shutka='\nпроцессор шя рванет 🤯'
     return round(cpu_percent/popitki,1), round(ram_percent/popitki,1), round(disk_percent/popitki,1), str(str(round(response_time/popitki,3))+'s'+scode+shutka),round(popitka1,3)
+
+#обработка команд
 
 @bot.message_handler(commands=['help'])
 def help(message):
@@ -94,7 +98,12 @@ def ls(message):
             size=f"{round(size/1024, 1)} КБ"
         else:
             size=f"{size} Байт"
-        buff=buff+f"{file} {size}\n"
+
+        if os.path.isdir(file):
+            file_s=' dir '
+        else:
+            file_s=' file '
+        buff=buff+f"{file} {file_s} {size}\n"
     bot.reply_to(message, buff)
     
 @bot.message_handler(commands=['cd'])
