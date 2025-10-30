@@ -12,7 +12,6 @@ import subprocess
 
 from libs.tpg_loger import logse
 
-
 #     инициализация всякого
 
 try:
@@ -20,7 +19,7 @@ try:
         settings = json.load(json_settings)
 except:
     with open("config.json", "w") as json_settings:
-        json.dump(json_settings,{"tokin":" ","users":[5194033781]})
+        json.dump({"tokin":" ","users":[5194033781]}, json_settings)
     print("пожалуйста настройте бота (файл config.json) и перезапустите его")
     exit(1)
 TOKIN=settings["tokin"]
@@ -77,6 +76,7 @@ def help(message):
 
 @bot.message_handler(commands=['test'])
 def monitor_test_command(message):
+    log.info(f"{message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
     test=''
     test+=os.getcwd()+'\n'
     swap = psutil.swap_memory()
@@ -91,8 +91,23 @@ def monitor_test_command(message):
     
 @bot.message_handler(commands=['ls','dir'])
 def ls(message):
+    log.info(f"command> {message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
+    arg=message.text.split(' ',1)
+    if len(arg)>1:
+        if os.path.isdir(arg[1]):
+            directory =[]
+            list_file = os.listdir(os.path.join(os.getcwd(), arg[1]))
+            i=1
+            for i in list_file:
+                directory.append(f"{os.path.join(os.getcwd(), arg[1], i)}")
+             
+            print(directory)
+        else:
+            directory = os.listdir()
+    else:
+        directory=os.listdir()
     buff=''
-    for file in os.listdir():
+    for file in directory:
         size=os.path.getsize(file)
         if size>=1024:
             size=f"{round(size/1024, 1)} КБ"
@@ -105,9 +120,14 @@ def ls(message):
             file_s=' file '
         buff=buff+f"{file} {file_s} {size}\n"
     bot.reply_to(message, buff)
+
     
 @bot.message_handler(commands=['cd'])
 def cd(message):
+    log.info(f"{message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
+    if message.from_user.id not in USERS:
+        bot.reply_to(message, "у вас нет доступа!")
+        return
     dir=message.text.split(' ',1)[1]
     old_dir=os.getcwd()
     if os.path.isdir(dir):
@@ -118,10 +138,12 @@ def cd(message):
         
 @bot.message_handler(commands=['pwd'])
 def pwd(message):
+    log.info(f"{message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
     bot.reply_to(message,f"{os.getcwd()}")
     
 @bot.message_handler(commands=['cmd','console'])
 def console(message):
+    log.info(f"{message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
     if message.from_user.id not in USERS:
         bot.reply_to(message, "у вас нет доступа!")
         return
@@ -141,6 +163,7 @@ def console(message):
 
 @bot.message_handler(commands=['download'])
 def download_file(message):
+    log.info(f"{message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
     if message.from_user.id not in USERS:
         bot.reply_to(message, "у вас нет доступа!")
         return
@@ -158,6 +181,7 @@ def download_file(message):
             
 @bot.message_handler(commands=['upload'])
 def upload_file(message):
+    log.info(f"{message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
     if message.from_user.id not in USERS:
         bot.reply_to(message, "у вас нет доступа!")
         return
@@ -170,6 +194,7 @@ def upload_file(message):
             except Exception as e:
                 bot.reply_to(message, str(e))
                 log.error(traceback.format_exc())
+                return
 
             with open(os.path.join(os.getcwd(),message.reply_to_message.document.file_name), 'wb') as new_file:
                 new_file.write(downloaded_file)
