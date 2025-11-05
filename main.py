@@ -71,12 +71,21 @@ def help(message):
 <code>/download</code> - отправка файлов, привер: <code>/download файл</code>
 
 <code>/upload</code> - загрузка файла на сервер с ботам, для загрузки необходимо отправить боту дакумент фото или видео далее нужно ответить командой <code>/upload</code> на это сообщение
+
+<code>/test</code> - отоброжает информацию о сервере 
+
+
+
+<a href="https://github.com/xHak2215/file_telegram_mesenger">GitHub проекта</a>
     """
     bot.reply_to(message, helpm, parse_mode='HTML', disable_web_page_preview=True)
 
 @bot.message_handler(commands=['test'])
 def monitor_test_command(message):
     log.info(f"{message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
+    if message.from_user.id not in USERS:
+        bot.reply_to(message, "у вас нет доступа!")
+        return
     test=''
     test+=os.getcwd()+'\n'
     swap = psutil.swap_memory()
@@ -92,6 +101,9 @@ def monitor_test_command(message):
 @bot.message_handler(commands=['ls','dir'])
 def ls(message):
     log.info(f"command> {message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
+    if message.from_user.id not in USERS:
+        bot.reply_to(message, "у вас нет доступа!")
+        return
     arg=message.text.split(' ',1)
     if len(arg)>1:
         if os.path.isdir(arg[1]):
