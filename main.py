@@ -28,6 +28,8 @@ USERS=list(settings["users"])
 log=logse()
 bot = telebot.TeleBot(TOKIN ,num_threads=5)
 
+real_directory = os.path.dirname(os.path.abspath(__file__))
+log.path_save_log=real_directory
 
 # Функция для мониторинга ресурсов
 def monitor_resources():
@@ -195,7 +197,7 @@ def upload_file(message):
                 file_info = bot.get_file(message.reply_to_message.document.file_id)
                 downloaded_file = bot.download_file(file_info.file_path)
             except telebot.apihelper.ApiTelegramException:
-                bot.reply_to(message, "байл слишком большой !")
+                bot.reply_to(message, "файл слишком большой !")
                 log.error(traceback.format_exc())
                 return
             except Exception as e:
