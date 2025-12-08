@@ -24,6 +24,10 @@ except:
     exit(1)
 TOKIN=settings["tokin"]
 USERS=list(settings["users"])
+DIR=settings["dir"]
+
+if DIR:
+    os.chdir(DIR)
 
 log=logse()
 bot = telebot.TeleBot(TOKIN ,num_threads=5)
@@ -218,7 +222,7 @@ def upload_file(message):
             bot.reply_to(message, "suppress ")
                 
         elif message.reply_to_message.video:
-            file_info = bot.get_file(message.reply_to_message.video[len(message.reply_to_message.video) - 1].file_id)
+            file_info = bot.get_file(message.reply_to_message.video.file_id)
             downloaded_file = bot.download_file(file_info.file_path)
 
             with open(os.path.join(os.getcwd(),  f"vid_upload_{datetime.now().strftime("%Hh%Mm")}.mp4"), 'wb') as new_file:
