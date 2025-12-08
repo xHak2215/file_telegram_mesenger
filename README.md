@@ -25,7 +25,7 @@
 {
     "tokin":" ",
     "users":[5194033781],
-    "dir"null
+    "dir":null
 }
 ```
 
