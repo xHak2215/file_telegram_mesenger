@@ -124,7 +124,7 @@ def ls(message):
             file_s=' dir '
         else:
             file_s=' file '
-        buff=buff+f"{file} {file_s} {size}\n"
+        buff=buff+f"<code>{file}</code> {file_s} {size}\n"
     bot.reply_to(message, buff)
 
     
@@ -138,7 +138,7 @@ def cd(message):
     old_dir=os.getcwd()
     if os.path.isdir(dir):
         os.chdir(dir)
-        bot.reply_to(message,f"{old_dir} -> {os.getcwd()}")
+        bot.reply_to(message,f"<code>{old_dir}</code> -> <code>{os.getcwd()}</code>", parse_mode='HTML')
     else:
         bot.reply_to(message, "такой директории нет или это не директория")
         
