@@ -125,9 +125,9 @@ def ls(message):
         else:
             file_s=' file '
         buff=buff+f"<code>{file}</code> {file_s} {size}\n"
-    bot.reply_to(message, buff)
+    bot.reply_to(message, buff, parse_mode='HTML')
 
-    
+
 @bot.message_handler(commands=['cd'])
 def cd(message):
     log.info(f"{message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")

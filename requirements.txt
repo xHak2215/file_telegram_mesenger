@@ -1,4 +1,4 @@
 telebot
 psutil
 requests
-subprocess
+subprocess.run

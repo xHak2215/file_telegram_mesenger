@@ -1,3 +1,6 @@
 log.log
 config.json
 *.log
+v
+*__pycache__
+*.pyc
