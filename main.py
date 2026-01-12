@@ -29,11 +29,10 @@ DIR=settings["dir"]
 if DIR:
     os.chdir(DIR)
 
-log=logse()
-bot = telebot.TeleBot(TOKIN ,num_threads=5)
-
 real_directory = os.path.dirname(os.path.abspath(__file__))
-log.path_save_log=real_directory
+
+log=logse(path_save_log=real_directory)
+bot = telebot.TeleBot(TOKIN ,num_threads=5)
 
 # Функция для мониторинга ресурсов
 def monitor_resources():
@@ -115,8 +114,15 @@ def ls(message):
     buff=''
     for file in directory:
         size=os.path.getsize(file)
-        if size>=1024:
+        if size//1_073_741_824 > 0:
+            size=f"{round(size/1_073_741_824, 1)} ГБ"
+
+        elif size//1_048_576 > 0:
+            size=f"{round(size/1_048_576, 1)} МБ"
+
+        elif size//1024 > 0:
             size=f"{round(size/1024, 1)} КБ"
+
         else:
             size=f"{size} Байт"
 
@@ -124,7 +130,10 @@ def ls(message):
             file_s=' dir '
         else:
             file_s=' file '
-        buff=buff+f"<code>{file}</code> {file_s} {size}\n"
+        buff+=f"<code>{file}</code> {file_s} {size}\n"
+
+    if buff == '':
+        buff+="empty"
     bot.reply_to(message, buff, parse_mode='HTML')
 
 
@@ -166,6 +175,16 @@ def console(message):
             bot.reply_to(message, str(out))
     except:
         bot.reply_to(message,traceback.format_exc())
+
+@bot.message_handler(commands=['mkdir', 'make_dir'])
+def make_dir(message):
+    log.info(f"{message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
+    if message.from_user.id not in USERS:
+        bot.reply_to(message, "у вас нет доступа!")
+        return
+    dir_name=message.text.split(' ', 1)[1]
+    os.mkdir(dir_name)
+    bot.reply_to(message, f"suppress make dir: <code>{os.path.join(os.getcwd(), dir_name)}</code>", parse_mode='HTML')
 
 @bot.message_handler(commands=['download'])
 def download_file(message):
