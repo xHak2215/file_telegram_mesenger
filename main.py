@@ -76,6 +76,8 @@ def help(message):
 <code>/download</code> - отправка файлов, привер: <code>/download файл</code>
 
 <code>/upload</code> - загрузка файла на сервер с ботам, для загрузки необходимо отправить боту дакумент фото или видео далее нужно ответить командой <code>/upload</code> на это сообщение
+
+<code>/mkdir</code> - создание директории в текущей директории
     """
     bot.reply_to(message, helpm, parse_mode='HTML', disable_web_page_preview=True)
 
