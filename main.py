@@ -235,20 +235,28 @@ def upload_file(message):
             bot.reply_to(message, "suppress ")
                 
         elif message.reply_to_message.photo:
-            file_info = bot.get_file(message.reply_to_message.photo[len(message.reply_to_message.photo) - 1].file_id)
-            downloaded_file = bot.download_file(file_info.file_path)
-
-            with open(os.path.join(os.getcwd(), f"img_upload_{datetime.now().strftime("%Hh%Mm")}.jpg"), 'wb') as new_file:
-                new_file.write(downloaded_file)
-            bot.reply_to(message, "suppress ")
+            try:
+                file_info = bot.get_file(message.reply_to_message.photo[-1].file_id)
+                downloaded_file = bot.download_file(file_info.file_path)
+                print(file_info)
+                with open(os.path.join(os.getcwd(), f"img_upload_{datetime.now().strftime("%Hh%Mm")}.jpg"), 'wb') as new_file:
+                    new_file.write(downloaded_file)
+                bot.reply_to(message, f"suppress \ninfo:\nsize:{file_info.file_size}")
+            except Exception as e:
+                bot.reply_to(message, f"error: {e}")
+                log.error(traceback.format_exc())
                 
         elif message.reply_to_message.video:
-            file_info = bot.get_file(message.reply_to_message.video.file_id)
-            downloaded_file = bot.download_file(file_info.file_path)
+            try:
+                file_info = bot.get_file(message.reply_to_message.video.file_id)
+                downloaded_file = bot.download_file(file_info.file_path)
 
-            with open(os.path.join(os.getcwd(),  f"vid_upload_{datetime.now().strftime("%Hh%Mm")}.mp4"), 'wb') as new_file:
-                new_file.write(downloaded_file)
-            bot.reply_to(message, "suppress ")
+                with open(os.path.join(os.getcwd(),  f"vid_upload_{datetime.now().strftime("%Hh%Mm")}.mp4"), 'wb') as new_file:
+                    new_file.write(downloaded_file)
+                bot.reply_to(message, "suppress ")
+            except Exception as e:
+                bot.reply_to(message, f"error: {e}")
+                log.error(traceback.format_exc())
             
         else:
             bot.reply_to(message, "не подходящий тип сообщения")
