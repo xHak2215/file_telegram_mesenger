@@ -238,8 +238,12 @@ def upload_file(message):
             try:
                 file_info = bot.get_file(message.reply_to_message.photo[-1].file_id)
                 downloaded_file = bot.download_file(file_info.file_path)
-                print(file_info)
-                with open(os.path.join(os.getcwd(), f"img_upload_{datetime.now().strftime("%Hh%Mm")}.jpg"), 'wb') as new_file:
+
+                file_name = f"img_upload_{datetime.now().strftime("%Hh-%Mm")}.jpg"
+                while os.path.isfile(file_name):
+                    file_name = f"img_upload_{datetime.now().strftime("%Hh-%Mm-%S")}.jpg"
+
+                with open(os.path.join(os.getcwd(), file_name, 'wb')) as new_file:
                     new_file.write(downloaded_file)
                 bot.reply_to(message, f"suppress \ninfo:\nsize:{file_info.file_size}")
             except Exception as e:
@@ -251,7 +255,11 @@ def upload_file(message):
                 file_info = bot.get_file(message.reply_to_message.video.file_id)
                 downloaded_file = bot.download_file(file_info.file_path)
 
-                with open(os.path.join(os.getcwd(),  f"vid_upload_{datetime.now().strftime("%Hh%Mm")}.mp4"), 'wb') as new_file:
+                file_name = f"vid_upload_{datetime.now().strftime("%Hh-%Mm")}.mp4"
+                while os.path.isfile(file_name):
+                    file_name = f"vid_upload_{datetime.now().strftime("%Hh-%Mm-%Ss")}.mp4"
+
+                with open(os.path.join(os.getcwd(),  file_name, 'wb')) as new_file:
                     new_file.write(downloaded_file)
                 bot.reply_to(message, "suppress ")
             except Exception as e:
