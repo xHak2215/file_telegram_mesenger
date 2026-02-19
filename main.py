@@ -99,12 +99,11 @@ def monitor_test_command(message):
 @bot.message_handler(commands=['ls','dir'])
 def ls(message):
     log.info(f"command> {message.text} | user>> {message.from_user.username} id>> {message.from_user.id}")
-    if "-all" in message.text:
-        all = True
-    else:
-        all=False
 
-    arg=message.text.split(' ',1).replace("-all", '')
+    arg=message.text.split(' ',1)
+
+    all = len(arg) >= 2 and "-all" in arg[2]
+
     if len(arg)>1:
         if os.path.isdir(arg[1]):
             directory = []
@@ -117,7 +116,7 @@ def ls(message):
         else:
             directory = os.listdir()
     else:
-        directory=os.listdir()
+        directory = os.listdir()
     buff=''
     for file in directory:
         if file[0]!='.' or all:
