@@ -98,16 +98,21 @@ def monitor_test_command(message):
     
 @bot.message_handler(commands=['ls','dir'])
 def ls(message):
-    log.info(f"command> {message.text} | user>> {message.from_user.username} id>> {message.from_user.id} ")
-    arg=message.text.split(' ',1)
+    log.info(f"command> {message.text} | user>> {message.from_user.username} id>> {message.from_user.id}")
+    if "-all" in message.text:
+        all = True
+    else:
+        all=False
+
+    arg=message.text.split(' ',1).replace("-all", '')
     if len(arg)>1:
         if os.path.isdir(arg[1]):
-            directory =[]
+            directory = []
             list_file = os.listdir(os.path.join(os.getcwd(), arg[1]))
             i=1
             for i in list_file:
                 directory.append(f"{os.path.join(os.getcwd(), arg[1], i)}")
-             
+
             print(directory)
         else:
             directory = os.listdir()
@@ -115,24 +120,25 @@ def ls(message):
         directory=os.listdir()
     buff=''
     for file in directory:
-        size=os.path.getsize(file)
-        if size//1_073_741_824 > 0:
-            size=f"{round(size/1_073_741_824, 1)} ГБ"
+        if file[0]!='.' or all:
+            size=os.path.getsize(file)
+            if size//1_073_741_824 > 0:
+                size=f"{round(size/1_073_741_824, 1)} ГБ"
 
-        elif size//1_048_576 > 0:
-            size=f"{round(size/1_048_576, 1)} МБ"
+            elif size//1_048_576 > 0:
+                size=f"{round(size/1_048_576, 1)} МБ"
 
-        elif size//1024 > 0:
-            size=f"{round(size/1024, 1)} КБ"
+            elif size//1024 > 0:
+                size=f"{round(size/1024, 1)} КБ"
 
-        else:
-            size=f"{size} Байт"
+            else:
+                size=f"{size} Байт"
 
-        if os.path.isdir(file):
-            file_s=' dir '
-        else:
-            file_s=' file '
-        buff+=f"<code>{file}</code> {file_s} {size}\n"
+            if os.path.isdir(file):
+                file_s=' dir '
+            else:
+                file_s=' file '
+            buff+=f"<code>{file}</code> {file_s} {size}\n"
 
     if buff == '':
         buff+="empty"
